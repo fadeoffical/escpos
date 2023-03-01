@@ -22,6 +22,8 @@ pub trait Printer {
 
     fn cut(&mut self) -> Result<(), String>;
 
+    fn init(&mut self) -> Result<(), String>;
+
     fn finish(&mut self) -> Result<(), String>;
 }
 

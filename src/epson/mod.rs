@@ -105,6 +105,10 @@ impl Printer for TmT88v {
         Ok(())
     }
 
+    fn init(&mut self) -> Result<(), String> {
+        Ok(()) // todo
+    }
+
     fn finish(&mut self) -> Result<(), String> {
         self.write_direct(&[0x0c_u8])?;
         Ok(())
