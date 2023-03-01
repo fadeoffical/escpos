@@ -1,25 +1,18 @@
 use escpos::job::instruction::{CutInstruction, TextInstruction};
 use escpos::job::PrintJob;
 
-fn main() {
-    let mut printer = escpos::Model::TmT88v.printer();
+fn main() -> Result<(), String> {
+    let mut printer = escpos::Model::TmT88v.get();
+
+    printer.set_default_line_spacing()?;
+
+    printer.set_line_spacing(50)?;
 
     PrintJob::default()
-        .add_instruction(TextInstruction::new_line("humor".to_string()))
+        .add_instruction(TextInstruction::new_line("Line 0".to_string()))
+        .add_instruction(TextInstruction::new_line("Line 1".to_string()))
         .add_instruction(CutInstruction::new())
-        .print(&mut printer)
-        .unwrap();
+        .print(&mut printer)?;
 
-    //
-    // // printer.write("=================  BEGIN  ================\n".as_bytes()).unwrap();
-    // for i in 0..10 {
-    //     printer.writeln("humor".as_bytes()).unwrap();
-    // }
-    // // printer.write("=================   END   ================\n".as_bytes()).unwrap();
-    //
-    // printer.flush().unwrap();
-    //
-    // printer.feed(5).unwrap();
-    // printer.cut().unwrap();
-    // printer.finish().unwrap();
+    Ok(())
 }

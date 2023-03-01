@@ -1,10 +1,16 @@
 use std::time::Duration;
 use rusb::{Context, Device, DeviceDescriptor, DeviceHandle};
-use crate::Printer;
-use crate::usb::{Descriptor, Product, Vendor};
+use crate::{Model, Printer};
+use crate::usb::Descriptor;
+
+pub(crate) enum Mode {
+    Page,
+    Standard,
+}
 
 pub(crate) struct TmT88v {
     descriptor: Descriptor,
+    mode: Mode,
 
     device: Device<Context>,
     device_descriptor: DeviceDescriptor,
@@ -15,17 +21,14 @@ pub(crate) struct TmT88v {
 
 impl TmT88v {
     pub fn new() -> Self {
-        let descriptor = Descriptor::new(
-            Vendor::new(0x04b8, String::from("Seiko Epson Corp.")),
-            Product::new(0x0202, String::from("TM-T88V")),
-        );
+        let descriptor = Model::TmT88v.get_usb_descriptor();
 
         let mut context = match Context::new() {
             Ok(context) => context,
             Err(error) => panic!("main(): {}", error),
         };
 
-        let (mut device, device_descriptor, mut device_handle) = match crate::usb::open_device(&mut context, &descriptor) {
+        let (device, device_descriptor, mut device_handle) = match crate::usb::open_device(&mut context, &descriptor) {
             Some((device, descriptor, handle)) => (device, descriptor, handle),
             None => panic!("main(): no device found"),
         };
@@ -52,6 +55,7 @@ impl TmT88v {
 
         Self {
             descriptor,
+            mode: Mode::Standard,
 
             device,
             device_descriptor,
@@ -111,6 +115,16 @@ impl Printer for TmT88v {
 
     fn finish(&mut self) -> Result<(), String> {
         self.write_direct(&[0x0c_u8])?;
+        Ok(())
+    }
+
+    fn set_default_line_spacing(&mut self) -> Result<(), String> {
+        self.write_direct(&[0x1b_u8, 0x32_u8])?;
+        Ok(())
+    }
+
+    fn set_line_spacing(&mut self, spacing: u8) -> Result<(), String> {
+        self.write_direct(&[0x1b_u8, 0x33_u8, spacing])?;
         Ok(())
     }
 }

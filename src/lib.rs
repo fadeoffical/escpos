@@ -25,28 +25,77 @@ pub trait Printer {
     fn init(&mut self) -> Result<(), String>;
 
     fn finish(&mut self) -> Result<(), String>;
+
+    fn set_default_line_spacing(&mut self) -> Result<(), String>;
+
+    fn set_line_spacing(&mut self, spacing: u8) -> Result<(), String>;
 }
 
 pub enum Model {
+    EUm30,
+    TmJ2000,
+    TmJ2100,
+    TmL90,
+    TmL90Lfc,
+    TmL100,
+    Tmm10,
+    Tmm30,
+    Tmm30ii,
+    Tmm30iiH,
+    Tmm30iii,
+    Tmm30iiiH,
+    Tmm30iiNt,
+    Tmm30iiS,
+    Tmm30iiSl,
+    Tmm50,
+    TmP20,
+    TmP20ii,
+    TmP60,
+    TmP60ii,
+    TmP80,
+    TmP80i,
+    TmT20,
+    TmT20ii,
+    TmT20iii,
+    TmT20iiil,
+    TmT20x,
+    TmT70,
+    TmT70ii,
+    TmT81iii,
+    TmT82ii,
+    TmT82iii,
+    TmT82iiil,
+    TmT82x,
+    TmT83iii,
+    TmT88iv,
     TmT88v,
+    TmT88vi,
+    TmT88vii,
+    TmT90,
+    TmT100,
+    TmU220,
+    TmU230,
 }
 
 impl Model {
     pub fn get_manufacturer(&self) -> Manufacturer {
         match self {
             Model::TmT88v => Manufacturer::Epson,
+            _ => panic!("Not implemented!")
         }
     }
 
     pub fn get_name(&self) -> String {
         match self {
             Model::TmT88v => String::from("TM-T88V"),
+            _ => panic!("Not implemented!")
         }
     }
 
-    pub fn printer(&self) -> Box<dyn Printer> {
+    pub fn get(&self) -> Box<dyn Printer> {
         match self {
             Model::TmT88v => Box::new(epson::TmT88v::new()),
+            _ => panic!("Not implemented!")
         }
     }
 
@@ -54,8 +103,9 @@ impl Model {
         match self {
             Model::TmT88v => Descriptor::new(
                 Vendor::new(0x04b8, String::from("Seiko Epson Corp.")),
-                Product::new(0x0202, String::from("TM-T88V"))
+                Product::new(0x0202, String::from("TM-T88V")),
             ),
+            _ => panic!("Not implemented!")
         }
     }
 }
